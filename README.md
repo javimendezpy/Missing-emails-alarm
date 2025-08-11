@@ -6,3 +6,5 @@ Cada día se envian correos a energias.renovables.es@dekra.com en los cuales se 
 Cuando alguno de los sistemas falla no se envía el correo correspondiente.
 No hay forma de ver de forma directa si faltan correos y por tanto alguna de los sistemas está fallando.
 Se quiere automatizar un proceso por el cual se identifique si faltan correos o no y guardar en una hoja de cálculo un booleano por sistema y día.
+
+Esta rama es la de edición de código.
