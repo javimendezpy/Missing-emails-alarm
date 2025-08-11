@@ -72,11 +72,12 @@ columna_fecha = fecha_objetivo.strftime("%Y-%m-%d")
 df[columna_fecha] = [1 if s in correos_recibidos else 0 for s in sistemas]
 
 # === GUARDAR CON BACKUP ===
-backup_path = excel_path.replace(".xlsx", "_backup.xlsx")
-if os.path.exists(excel_path):
-    os.replace(excel_path, backup_path)
-df.to_excel(excel_path, index=False)
+#backup_path = excel_path.replace(".xlsx", "_backup.xlsx")
+#if os.path.exists(excel_path):
+#    os.replace(excel_path, backup_path)
+#df.to_excel(excel_path, index=False)
 
 print(f"\n✅ Columna '{columna_fecha}' actualizada en {excel_path}")
-print(f"💾 Backup creado en: {backup_path}")
+#print(f"💾 Backup creado en: {backup_path}")
+
 
