@@ -14,7 +14,14 @@ debemos guardar en la hoja de cálculo "1(windcube)" en la fila de Potrillo y en
 
 
 import pandas as pd 
-import re
+import re 
+''' Regular expression operations (regex) -> Reconocer patrones en strings
+- re.match(patron, texto) : Comprueba si el texto empieza con el patrón
+- re.search(patron, texto) : Busca el patrón en cualquier parte del texto
+- re.findall(patron, texto) : Devuelve todas las ocurrencias del patrón en el texto y las pone en una lista
+- re.sub(patron, reemplazo, texto) : Reemplaza las ocurrencias del patrón en el texto
+- re.compile(patron) : Compila el patrón para reutilizarlo varias veces de forma más eficiente
+'''
 import win32com.client
 
 df = pd.read_excel('sistemas_id_asuntos.xlsx')
@@ -38,6 +45,7 @@ outlook = win32com.client.Dispatch("Outlook.Application").GetNamespace("MAPI")
 #for store in outlook.Stores:
     #print(" -", store.DisplayName)
 
+
 nombre_cuenta = "energias.renovables.es@dekra.com"
 store = outlook.Stores[nombre_cuenta]
 bandeja_entrada = store.GetDefaultFolder(6)
@@ -45,8 +53,11 @@ mensajes = bandeja_entrada.Items
 mensajes.Sort("[ReceivedTime]", True)
 
 fecha_actual = pd.Timestamp.now().normalize() # Formato 
-fecha_actual_ini = fecha_actual - pd.Timedelta(days=1)  # Un día antes
-fecha_actual_fin = fecha_actual + pd.Timedelta(days=1)  # Un día después
+fecha_actual_ini = fecha_actual.date()  # Fecha actual a las 00:00:00
+fecha_actual_fin = (fecha_actual + pd.Timedelta(days=1)).date()  # Un día después
+
+print("Fecha inicial: ", fecha_actual_ini)
+print("Fecha final: ", fecha_actual_fin)
 
 for sistema in sistemas:
 
@@ -71,34 +82,26 @@ for sistema in sistemas:
         patron_asunto = re.compile(rf"^Data of {id} ——(\d{{4}}/\d{{2}}/\d{{2}})$")
         rem = 'molas'
 
-
-    # Filtrar mensajes por remitente y fecha
-    mensajes_filtrados = []
-    for msg in mensajes:
-        print(msg.SenderEmailAddress)
-        print(msg.Subject)
-        print(type(msg.ReceivedTime))
-        try:    
-            # Comprobar remitente
-            if msg.SenderEmailAddress.lower() != remitente.lower():
-                continue
-
-             # Comprobar que tiene fecha
-            if not hasattr(msg, "ReceivedTime") or msg.ReceivedTime is None:
-                continue
-
-             # Convertir a pandas.Timestamp y normalizar
-            from datetime import datetime
-            fecha_msg = pd.Timestamp(datetime.fromtimestamp(msg.ReceivedTime.timestamp())).normalize()
-
-            if fecha_actual_ini <= fecha_msg <= fecha_actual_fin:
-                mensajes_filtrados.append(msg)
-
-        except Exception as e:
-            print(f"⚠ Error procesando mensaje: {e}")
-            continue
+    print(patron_asunto)
 
     # Identificar si se ha recibido el correo
     #print(mensajes_filtrados)
 
-    
+    def contiene_elementos(asunto: str) -> str:
+        if patron_asunto.match(asunto):  # .match = desde el inicio de la cadena
+            return "sí"
+        else:
+            return "no"
+        
+    for msg in mensajes:
+        print(msg.Subject)
+        print(pd.Timestamp(msg.ReceivedTime).date())
+
+        if fecha_actual_ini <= pd.Timestamp(msg.ReceivedTime).date() <= fecha_actual_fin:
+            if msg.SenderEmailAddress == remitente:
+                if contiene_elementos(msg.Subject) == "sí":
+                    out = f"1 ({rem})"
+                else:
+                    out = f"0 ({rem})"
+
+    print(out)
