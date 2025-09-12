@@ -1,4 +1,4 @@
-# Missing-emails-alarm
+# Control e-mails
 
 Este repositorio pretende recoger código relacionado con la siguiente tarea para el departamento de Green Energies de DEKRA Industrial
 
